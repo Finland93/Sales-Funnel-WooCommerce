@@ -244,20 +244,14 @@ function sales_funnel_woocommerce_redirect_buy_now_to_checkout($url, $product) {
     $enable_buy_now = isset($options['enable_buy_now']) && $options['enable_buy_now'] === 'on';
     $buy_now_text = $options['buy_now_text'] ?? '';
 
-    // Add this line to check if the cart redirection option is enabled
-    $cart_redirection_to_checkout = isset($options['cart_redirection_to_checkout']) && $options['cart_redirection_to_checkout'] === 'on';
+    if ($enable_buy_now && !empty($buy_now_text) && $product && $product->is_purchasable() && $product->is_in_stock() && isset($_GET['buy_now']) && $_GET['buy_now'] == $product->get_id()) {
+        // Add the product to the cart with a quantity of 1
+        WC()->cart->add_to_cart($product->get_id(), 1);
 
-    if ($enable_buy_now && !empty($buy_now_text) && $product && $product->is_purchasable() && $product->is_in_stock()) {
-        // If the cart redirection option is enabled, redirect to checkout
-        if ($cart_redirection_to_checkout) {
-            // Create a new cart instance to prevent redirecting to an empty cart page
-            $cart = WC()->cart;
-            $cart->empty_cart();
-            $cart->add_to_cart($product->get_id());
-            $url = wc_get_checkout_url();
-        } else {
-            // Otherwise, keep the original behavior and add the product to the cart
-            $url = $product->add_to_cart_url();
+        if (isset($options['cart_redirection_to_checkout']) && $options['cart_redirection_to_checkout'] === 'on') {
+            // Redirect to the checkout page
+            wp_redirect(wc_get_checkout_url());
+            exit;
         }
     }
 
@@ -281,6 +275,9 @@ function sales_funnel_woocommerce_add_buy_now_button() {
         echo '<a href="' . esc_url($product->add_to_cart_url()) . '" class="button alt" style="margin-bottom: ' . esc_attr($buy_now_margin_bottom) . 'px;">' . esc_html($buy_now_text) . '</a>';
     }
 }
+
+
+
 
 // Add cart to checkout page
 function sales_funnel_woocommerce_add_cart_to_checkout_page() {
