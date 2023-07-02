@@ -26,6 +26,12 @@ add_action('admin_menu', 'sales_funnel_woocommerce_menu_page');
 
 // Menu page callback function
 function sales_funnel_woocommerce_page_callback() {
+    // Check if the form was submitted and the settings were saved
+    if (isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true') {
+        // Display the notice
+        sales_funnel_woocommerce_settings_saved_notice();
+    }
+
     echo '<div class="wrap">';
     echo '<h1>Sales Funnel</h1>';
     echo '<p>Add buy now button, edit add to cart text, add small order fees, and more WooCommerce customizations.</p>';
@@ -39,6 +45,7 @@ function sales_funnel_woocommerce_page_callback() {
 
     echo '</div>';
 }
+
 
 // Register plugin options
 function sales_funnel_woocommerce_register_options() {
@@ -245,11 +252,9 @@ function sales_funnel_woocommerce_redirect_buy_now_to_checkout($url, $product) {
     $buy_now_text = $options['buy_now_text'] ?? '';
 
     if ($enable_buy_now && !empty($buy_now_text) && $product && $product->is_purchasable() && $product->is_in_stock() && isset($_GET['buy_now']) && $_GET['buy_now'] == $product->get_id()) {
-        // Add the product to the cart with a quantity of 1
-        WC()->cart->add_to_cart($product->get_id(), 1);
 
         if (isset($options['cart_redirection_to_checkout']) && $options['cart_redirection_to_checkout'] === 'on') {
-            // Redirect to the checkout page
+			// Redirect to the checkout page
             wp_redirect(wc_get_checkout_url());
             exit;
         }
@@ -263,6 +268,7 @@ add_filter('woocommerce_product_single_add_to_cart_url', 'sales_funnel_woocommer
 
 
 // Add "Buy Now" button to shop listing page
+
 function sales_funnel_woocommerce_add_buy_now_button() {
     global $product;
 
@@ -272,12 +278,12 @@ function sales_funnel_woocommerce_add_buy_now_button() {
     $buy_now_margin_bottom = $options['buy_now_margin_bottom'] ?? '';
 
     if ($enable_buy_now && !empty($buy_now_text) && $product && $product->is_purchasable() && $product->is_in_stock()) {
-        echo '<a href="' . esc_url($product->add_to_cart_url()) . '" class="button alt" style="margin-bottom: ' . esc_attr($buy_now_margin_bottom) . 'px;">' . esc_html($buy_now_text) . '</a>';
+        $buy_now_url = add_query_arg('buy_now', $product->get_id(), $product->add_to_cart_url());
+
+        echo '<a href="' . esc_url($buy_now_url) . '" class="button alt" style="margin-bottom: ' . esc_attr($buy_now_margin_bottom) . 'px;">' . esc_html($buy_now_text) . '</a>';
     }
 }
-
-
-
+add_action('woocommerce_after_shop_loop_item', 'sales_funnel_woocommerce_add_buy_now_button', 10);
 
 // Add cart to checkout page
 function sales_funnel_woocommerce_add_cart_to_checkout_page() {
@@ -290,7 +296,6 @@ function sales_funnel_woocommerce_add_cart_to_checkout_page() {
 }
 
 add_action('woocommerce_before_checkout_form', 'sales_funnel_woocommerce_add_cart_to_checkout_page', 5);
-add_action('woocommerce_after_shop_loop_item', 'sales_funnel_woocommerce_add_buy_now_button', 10);
 
 // Redirect cart page to checkout if cart is not empty
 add_action('template_redirect', 'sales_funnel_woocommerce_redirect_cart_to_checkout');
@@ -314,4 +319,10 @@ function sales_funnel_woocommerce_redirect_cart_to_shop() {
         wp_redirect(get_permalink(wc_get_page_id('shop')));
         exit;
     }
+}
+
+function sales_funnel_woocommerce_settings_saved_notice() {
+    echo '<div class="notice notice-success is-dismissible">';
+    echo '<p>Settings saved.</p>';
+    echo '</div>';
 }
