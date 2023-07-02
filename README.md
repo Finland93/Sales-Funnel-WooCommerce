@@ -7,10 +7,9 @@ The Sales Funnel WooCommerce plugin is a custom WordPress plugin designed to enh
 - Enable a small order fee to incentivize larger purchases and increase order value.
 - Define a small fee name, amount, and threshold to apply the fee for orders under a specific amount.
 - Add a "Buy Now" button on product listing pages for instant checkout, reducing friction in the purchase process.
-- - Redirect the "Buy Now" button directly to the checkout page for a streamlined buying experience.
+- Redirect the "Buy Now" button directly to the checkout page for a streamlined buying experience.
 - Customize the button text and margin for the "Buy Now" button to align with your store's design.
 - Add the shopping cart to the checkout page, allowing customers to review their order before completing the purchase.
-- Modify the "Add to Cart" success message to provide a personalized confirmation to customers.
 
 # Installation
 - Download the plugin as a ZIP file from the GitHub repository.
