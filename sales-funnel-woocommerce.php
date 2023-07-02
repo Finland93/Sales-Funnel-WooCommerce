@@ -35,15 +35,38 @@ function sales_funnel_woocommerce_page_callback() {
     echo '<div class="wrap">';
     echo '<h1>Sales Funnel</h1>';
     echo '<p>Add buy now button, edit add to cart text, add small order fees, and more WooCommerce customizations.</p>';
-
+	
+	    // Recommended plugins section
+    echo '<div style="display: flex;">';
+    echo '<div style="flex: 1;">';
+    
     // Display the options form
     echo '<form method="post" action="options.php">';
     settings_fields('sales_funnel_woocommerce_options');
     do_settings_sections('sales-funnel-woocommerce');
     submit_button();
     echo '</form>';
-
+    
     echo '</div>';
+
+    // Recommended plugins section
+    echo '<div style="flex: 1; padding-left: 20px;">';
+    echo '<h2>Recommended Plugins</h2>';
+    echo '<div>';
+    echo '<strong>Yith - Quick View:</strong> <a href="https://wordpress.org/plugins/yith-woocommerce-quick-view/" target="_blank">Download</a>';
+    echo '</div>';
+    echo '<div>';
+    echo '<strong>Side Cart Woocommerce:</strong> <a href="https://wordpress.org/plugins/side-cart-woocommerce/" target="_blank">Download</a>';
+    echo '</div>';
+    echo '<div>';
+    echo '<strong>WooCommerce Cart Abandonment Recovery:</strong> <a href="https://wordpress.org/plugins/woo-cart-abandonment-recovery/" target="_blank">Download</a>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+    
+    echo '</div>';
+
+
 }
 
 
@@ -215,7 +238,7 @@ function sales_funnel_woocommerce_field_callback($args) {
 }
 
 // Apply small order fee
-function sales_funnel_woocommerce_apply_small_fee($cart) {
+function sales_funnel_woocommerce_apply_small_fee() {
     $options = get_option('sales_funnel_woocommerce_options');
     $enable_small_fee = isset($options['enable_small_fee']) && $options['enable_small_fee'] === 'on';
     $small_fee_name = $options['small_fee_name'] ?? '';
@@ -225,11 +248,15 @@ function sales_funnel_woocommerce_apply_small_fee($cart) {
     $cart_total = WC()->cart->subtotal;
 
     if ($enable_small_fee && $cart_total < $small_fee_threshold) {
-        $fee = new WC_Cart_Fee($small_fee_name, $small_fee_amount, '');
-        $cart->add_fee($fee);
+        $fee_label = $small_fee_name;
+        $fee_total = floatval($small_fee_amount);
+
+        WC()->cart->add_fee($fee_label, $fee_total);
     }
 }
 add_action('woocommerce_cart_calculate_fees', 'sales_funnel_woocommerce_apply_small_fee');
+
+
 
 // Change "Add to Cart" button text
 function sales_funnel_woocommerce_change_add_to_cart_text($text) {
@@ -326,3 +353,10 @@ function sales_funnel_woocommerce_settings_saved_notice() {
     echo '<p>Settings saved.</p>';
     echo '</div>';
 }
+
+// Plugin uninstall hook
+function sales_funnel_woocommerce_uninstall() {
+    // Code to run on plugin uninstallation
+    delete_option('sales_funnel_woocommerce_options');
+}
+register_uninstall_hook(__FILE__, 'sales_funnel_woocommerce_uninstall');
