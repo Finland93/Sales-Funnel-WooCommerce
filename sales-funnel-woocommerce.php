@@ -10,6 +10,11 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
+// Exit if directly accessed
+if (!defined('ABSPATH')) {
+    exit; 
+}
+
 // Add menu page
 function sales_funnel_woocommerce_menu_page() {
     add_menu_page(
