@@ -1,25 +1,31 @@
-# Sales Funnel WooCommerce Plugin
-The Sales Funnel WooCommerce plugin is a custom WordPress plugin designed to enhance the functionality of your WooCommerce store. It provides several customizations that help optimize your sales funnel and improve the user experience.
+# Sales Funnel WooCommerce
 
-# Key Features
-- Add a sales funnel menu page in the WordPress admin area for easy access to plugin settings.
-- Customize the "Add to Cart" button text to match your branding and product descriptions.
-- Enable a small order fee to incentivize larger purchases and increase order value.
-- Define a small fee name, amount, and threshold to apply the fee for orders under a specific amount.
-- Add a "Buy Now" button on product listing pages for instant checkout, reducing friction in the purchase process.
-- Redirect the "Buy Now" button directly to the checkout page for a streamlined buying experience.
-- Customize the button text and margin for the "Buy Now" button to align with your store's design.
-- Add the shopping cart to the checkout page, allowing customers to review their order before completing the purchase.
+A small WooCommerce add-on that helps optimise the buying flow: a **Buy Now** button for instant checkout, custom **Add to Cart** text, a **small-order fee**, an optional **cart on the checkout page**, and **cart→checkout** redirects.
 
-# Installation
-- Download the plugin as a ZIP file from the GitHub repository.
-- Upload and activate the plugin in your WordPress admin panel.
-- Navigate to the Sales Funnel menu page to configure the plugin settings.
-- Customize the options according to your sales funnel requirements.
-- Save the settings and start optimizing your sales funnel with the new features.
+## Features
 
-# Contributing
-Contributions to the Sales Funnel WooCommerce plugin are welcome! If you encounter any issues or have suggestions for improvements, please open an issue on the GitHub repository. You can also submit pull requests to contribute code changes.
+- **Buy Now** on shop listings (one click → checkout) and on single products (respects quantity / variation).
+- Custom **Add to Cart** button text.
+- **Small order fee** applied when the subtotal is below a threshold.
+- Show the **cart on the checkout page**.
+- **Redirect** the cart page straight to checkout (or to the shop when empty).
+- HPOS (High-Performance Order Storage) compatible.
 
-# License
-This plugin is licensed under the GPLv2 or later. You can find the full license text in the LICENSE file.
+## Installation
+
+1. Make sure **WooCommerce** is installed and active.
+2. Upload the `sales-funnel-woocommerce` folder to `/wp-content/plugins/` and activate.
+3. Open the **Sales Funnel** admin menu and configure.
+
+## What changed in 2.0.0
+
+- **Fixed the Buy Now flow.** 1.0 called `wp_redirect()` *inside* a `…add_to_cart_url` filter, which is fragile and can redirect at the wrong moment. Buy Now now uses WooCommerce's purpose-built `woocommerce_add_to_cart_redirect` filter, so add-to-cart happens normally and the redirect to checkout is clean. The single-product Buy Now is a submit button inside the form, so it respects the chosen quantity and variation.
+- **Settings are now sanitised on save** (1.0 registered the option with no sanitize callback). Amounts are parsed as decimals (comma or dot), the threshold/amount are validated, and the fee is skipped when either is zero.
+- Added a **WooCommerce dependency check** with an admin notice, an `is_admin()/AJAX` guard on the fee, escaping throughout, i18n, and a clean uninstall.
+- Buy Now only appears on products that can be added directly (variable/grouped products are skipped on the shop loop, since they need options chosen first).
+
+## License
+
+GPLv2 or later — see [LICENSE](LICENSE).
+
+**Author:** [Finland93](https://github.com/Finland93)
